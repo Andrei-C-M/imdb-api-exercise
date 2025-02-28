@@ -8,39 +8,36 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+        <!-- Trailer -->
+    <section class="carousel-wrap">
+        <div id="carousel">
+            <iframe id="trailer" width="600" height="315" src="" title="YouTube video player" frameborder="0" allowfullscreen muted></iframe>
+            <div class="controls">
+                <button id="prev">Previous</button>
+                <button id="next">Next</button>
+            </div>
+        </div>
+    </section>
+        <!-- My (crappy) code -->    
     <main class="wrapper">
-        <section class="logo">
+        <header class="logo">
             <img src="./resources/logo.png" alt="">
             <article class="container">
                 <p>Movie<span>Database</span></p>
-        </section>
-        <div class="search-container">
-            <div class="search-element">
+            </header>
+        <section class="search-container">
+            <article class="search-element">
                 <h3>Search for a movie or a show:</h3>
-                <input type="text" class="form-control" placeholder="Movie Title..." id="movie-search-box" onkeyup="findMovies()">
-
+                <input type="text" class="form-control" placeholder="Movie Title..." id="movie-search-box" onkeyup="findMovies()" onclick="findMovies()">
                     <div class="search-list" id="search-list">
-                        <!-- search list items go here - testing how it looks-->
-<!--                         <div class="search-list-item">
-                            <div class = "search-item-thumbnail">
-                                <img src="./resources/medium-cover.jpg" alt="Movie Poster">
-                            </div>
-                            <div class = "search-item-info">
-                                <h3>Captain America: Brave New World</h3>
-                                <p>2025</p>
-                            </div>
-                        </div>  -->
                     </div>
-            </div>
-        </div>
-        <!-- end of search container -->
-
-    
-        <!-- result container -->
-        <div class="container">
+                </article>
+        </section>
+        <!-- results -->
+        <section class="container">
             <div class="result-container">
                 <div class="result-grid" id="result-grid">
-                    <!-- movie information here-->
+                   <!--   movie information here - I used this when i initially ccreated the html, to see how a search result would look
                     <div class="movie-poster">
                         <img src="./resources/medium-cover.jpg" alt="Movie Poster">
                     </div>
@@ -57,18 +54,20 @@
                         <p class="plot"><b>Plot: </b>Sam Wilson, the new Captain America, finds himself in the middle of an international incident and must discover the motive behind a nefarious global plan.</p>
                         <p class="language"><b>Language: </b>English</p>
                         <p class="awards"><b><i class = "fa-solid fa-award"></i></b>Nominated for the Rusty Bagel Awards</p>
-                    </div>
+                    </div> -->
                 </div>
             </div>
-        </div>
-        <!-- end of result container -->
-                    
+        </section>
+        <!-- Top 20 movies -->
+        <section class="top-movies-wrapper">
+            <article class="top-movies">
+                <h2>IMDB's 20 Highest Ranked Movies</h2>
+                <ul id="movie-list"></ul>
+            </article>
+        </section>        
     </main>
 
-
-
-
-
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
+    <script type="module" src="carousel.js"></script>
 </body>
 </html>

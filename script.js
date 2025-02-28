@@ -1,21 +1,23 @@
 //apikey = bbcf57a4
 //http://www.omdbapi.com/?apikey=bbcf57a4&t=captain+america
 
-//start by asigning the various html elements to constants
+//importing stuff
 
+import { loadJSON } from './carousel.js';
+
+
+// Start by assigning the various HTML elements to constants
 const movieSearchBox = document.getElementById('movie-search-box');
 const searchList = document.getElementById('search-list');
 const resultGrid = document.getElementById('result-grid');
 
-//get movies from the OMDb API
-
+// Get movies from the OMDb API
 async function loadMovies(searchTerm) {
-    const URL= `https://www.omdbapi.com/?apikey=bbcf57a4&t=${searchTerm}`;
-    const res = await fetch(`${URL}`);
+    const URL = `https://www.omdbapi.com/?apikey=bbcf57a4&s=${searchTerm}*`;
+    const res = await fetch(URL);
     const data = await res.json();
-    if(data.Response == 'True') displayMovieList(data.Search);
+    if(data.Response === 'True') displayMovieList(data.Search);
 }
-
 
 function findMovies(){
     let searchTerm = (movieSearchBox.value).trim();
@@ -28,27 +30,22 @@ function findMovies(){
 }
 
 function displayMovieList(movies){
-        console.log('Movies:', movies); // log the movies array
-        
-        if (!movies || !Array.isArray(movies)) {
-            console.error('Invalid movies array:', movies); // Log an error if movies is not an array
-            return;
-        }
     searchList.innerHTML = "";
     for(let idx = 0; idx < movies.length; idx++) {
         let movieListItem = document.createElement('div');
-        movieListItem.dataset.id = movies[idx].imdbID; //using imdbID from OMDb api
+        movieListItem.dataset.id = movies[idx].imdbID; // using imdbID from OMDb api
         movieListItem.classList.add('search-list-item');
-        if(movies[idx].Poster != "N/A")
+        let moviePoster;
+        if(movies[idx].Poster !== "N/A")
             moviePoster = movies[idx].Poster;
         else 
-            moviePoster = "resources/missing-poster.svg"; 
+            moviePoster = "./resources/missing-poster.svg"; 
 
         movieListItem.innerHTML = `
-        <div class = "search-item-thumbnail">
-            <img src = "${moviePoster}" alt = "${movies[idx].Title} + ${movies[idx].Year}">
+        <div class="search-item-thumbnail">
+            <img src="${moviePoster}" alt="${movies[idx].Title} + ${movies[idx].Year}">
         </div>
-        <div class = "search-item-info">
+        <div class="search-item-info">
             <h3>${movies[idx].Title}</h3>
             <p>${movies[idx].Year}</p>
         </div>
@@ -64,33 +61,88 @@ function loadMovieDetails(){
         movie.addEventListener('click', async () => {
             searchList.classList.add('hide-search-list');
             movieSearchBox.value = "";
-            const result = await fetch(`http://www.omdbapi.com/?i=${movie.dataset.id}&apikey=bbcf57a4`);
+            // Fixed HTTP to HTTPS
+            const result = await fetch(`https://www.omdbapi.com/?i=${movie.dataset.id}&apikey=bbcf57a4`);
             const movieDetails = await result.json();
             displayMovieDetails(movieDetails);
         });
     });
 }
 
-
 function displayMovieDetails(details) {
     resultGrid.innerHTML = `
     <div class="movie-poster">
-        <img src="./resources/medium-cover.jpg" alt="Movie Poster">
+        <img src="${(details.Poster !== "N/A") ? details.Poster : "./resources/missing-poster.svg"}" alt="movie poster">
     </div>
     <div class="movie-info">
-        <h3 class="movie-title">Captain America: Brave New World</h3>
+        <h3 class="movie-title">${details.Title}</h3>
         <ul class="movie-misc-info">
-            <li class="year">Year: 2025</li>
-            <li class="rated">Rated: PG-13</li>
-            <li class="released">Release date: 14 February 2025</li>
+            <li class="year">Year: ${details.Year}</li>
+            <li class="rated">Rated: ${details.Rated}</li>
+            <li class="released">Release date: ${details.Released}</li>
         </ul>
-        <p class="genre"><b>Genre: </b>Action, Adventure, Sci-Fi</p>
-        <p class="writer"><b>Writers: </b>Rob Edwards, Malcom Spellman, Dalan Musson</p>
-        <p class="actors"><b>Actors: </b> Anthony Mackie, Harrison Ford, Shira Haas, Danny Ramirez...</p>
-        <p class="plot"><b>Plot: </b>Sam Wilson, the new Captain America, finds himself in the middle of an international incident and must discover the motive behind a nefarious global plan.</p>
-        <p class="language"><b>Language: </b>English</p>
-        <p class="awards"><b><i class = "fa-solid fa-award"></i></b>Nominated for the Rusty Bagel Awards</p>
+        <p class="genre"><b>Genre: </b>${details.Genre}</p>
+        <p class="writer"><b>Writers: </b>${details.Writer}</p>
+        <p class="actors"><b>Actors: </b> ${details.Actors}</p>
+        <p class="plot"><b>Plot: </b>${details.Plot}</p>
+        <p class="language"><b>Language: </b>${details.Language}</p>
+        <p class="awards"><b><i class="fa-solid fa-award"></i></b>${details.Awards}</p>
     </div>
     `;
-
 }
+
+// Initialize event listeners when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Event listener for search input
+    if (movieSearchBox) {
+        movieSearchBox.addEventListener('keyup', findMovies);
+    }
+
+    // Hide the search list when clicking outside, otherwise it look weird
+    window.addEventListener('click', (event) => {
+        if(event.target.className !== "form-control"){
+            searchList.classList.add('hide-search-list');
+        }
+    });
+});
+
+//Feth top movies from Jesper's JSON file
+
+async function fetchTopMovies() {
+    const response = await fetch('https://santosnr6.github.io/Data/favoritemovies.json');
+    const data = await response.json();
+    console.log(data);
+
+    if (data && data.movies) {
+        const topMovies = data.movies.slice(0, 20);
+        displayTopMovies(topMovies);
+    }
+}
+
+fetch('https://santosnr6.github.io/Data/favoritemovies.json')
+  .then(response => response.json())
+  .then(data => {
+    const movieList = document.getElementById('movie-list');
+    data.forEach(movie => {
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `
+        <h2>${movie.Title}</h2>
+        <img src="${movie.Poster}" alt="Movie Poster">
+        <p>Trailer Link: <a href="${movie.Trailer_link}" target="_blank">Watch Trailer</a></p>
+      `;
+      movieList.appendChild(listItem);
+    });
+  })
+  .catch(error => console.error('Dude, you got another error:', error));
+
+  //trailers from carousel.js
+  loadJSON();
+
+  document.getElementById('prev').addEventListener('click', () => {
+    loadJSON();
+  });
+  
+  document.getElementById('next').addEventListener('click', () => {
+    loadJSON();
+  });
+  
