@@ -10,6 +10,11 @@ import { loadJSON } from './carousel.js';
 const movieSearchBox = document.getElementById('movie-search-box');
 const searchList = document.getElementById('search-list');
 const resultGrid = document.getElementById('result-grid');
+const favoritesGrid = document.getElementById('favorites-grid');
+if (favoritesGrid) {
+    document.addEventListener('DOMContentLoaded', displayFavorites);
+}
+
 
 // Get movies from the OMDb API
 async function loadMovies(searchTerm) {
@@ -70,30 +75,30 @@ function loadMovieDetails(){
 }
 
 function displayMovieDetails(details) {
+    const isFavorite = getFavorites().some(fav => fav.imdbID === details.imdbID);
     resultGrid.innerHTML = `
-    <div class="movie-poster">
-        <img src="${(details.Poster !== "N/A") ? details.Poster : "./resources/missing-poster.svg"}" alt="movie poster">
-    </div>
-    <div class="movie-info">
-        <h3 class="movie-title">${details.Title}</h3>
-        <ul class="movie-misc-info">
-            <li class="year">Year: ${details.Year}</li>
-            <li class="rated">Rated: ${details.Rated}</li>
-            <li class="released">Release date: ${details.Released}</li>
-        </ul>
-        <p class="genre"><b>Genre: </b>${details.Genre}</p>
-        <p class="writer"><b>Writers: </b>${details.Writer}</p>
-        <p class="actors"><b>Actors: </b> ${details.Actors}</p>
-        <p class="plot"><b>Plot: </b>${details.Plot}</p>
-        <p class="language"><b>Language: </b>${details.Language}</p>
-        <p class="awards"><b><i class="fa-solid fa-award"></i></b>${details.Awards}</p>
-    </div>
+        <div class="movie-poster">
+            <img src="${details.Poster !== "N/A" ? details.Poster : "./resources/missing-poster.svg"}" alt="movie poster">
+        </div>
+        <div class="movie-info">
+            <h3>${details.Title}</h3>
+            <p><b>Year:</b> ${details.Year}</p>
+            <p><b>Genre:</b> ${details.Genre}</p>
+            <p><b>Plot:</b> ${details.Plot}</p>
+            <button id="fav-btn" class="${isFavorite ? 'favorited' : ''}">❤ ${isFavorite ? 'Remove from' : 'Add to'} Favorites</button>
+        </div>
     `;
+    
+    document.getElementById('fav-btn').addEventListener('click', () => {
+        toggleFavorite(details);
+        displayMovieDetails(details);
+    });
 }
 
-// Initialize event listeners when DOM is loaded
+document.addEventListener('DOMContentLoaded', displayFavorites);
+
+// Event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Event listener for search input
     if (movieSearchBox) {
         movieSearchBox.addEventListener('keyup', findMovies);
     }
@@ -146,3 +151,46 @@ fetch('https://santosnr6.github.io/Data/favoritemovies.json')
     loadJSON();
   });
   
+
+// This supposedly adds favourite movies to local storage - sometimes
+function displayFavorites() {
+    const favorites = getFavorites();
+    favoritesGrid.innerHTML = favorites.length ? '' : '<p>No favorite movies yet.</p>';
+    
+    favorites.forEach(movie => {
+        const movieItem = document.createElement('div');
+        movieItem.classList.add('favorite-movie');
+        movieItem.innerHTML = `
+            <img src="${movie.Poster}" alt="${movie.Title}">
+            <h3>${movie.Title}</h3>
+            <button class="remove-fav" data-id="${movie.imdbID}">Remove</button>
+        `;
+        
+        movieItem.querySelector('.remove-fav').addEventListener('click', () => {
+            toggleFavorite(movie);
+        });
+        
+        favoritesGrid.appendChild(movieItem);
+    });
+}
+
+function getFavorites() {
+    return JSON.parse(localStorage.getItem('favorites')) || [];
+}
+
+function saveFavorites(favorites) {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+}
+
+function toggleFavorite(movie) {
+    let favorites = getFavorites();
+    const exists = favorites.find(fav => fav.imdbID === movie.imdbID);
+    
+    if (exists) {
+        favorites = favorites.filter(fav => fav.imdbID !== movie.imdbID);
+    } else {
+        favorites.push(movie);
+    }
+    saveFavorites(favorites);
+    displayFavorites();
+}

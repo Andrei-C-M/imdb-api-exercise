@@ -407,3 +407,96 @@ button {
       width: 100%;
     }
   }
+
+
+  /* Navbar */
+.navbar {
+    display: block;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--light-dark-color);
+    width: 10rem;
+    align-items: center;
+}
+
+.navbar li {
+    font-size: 1.2rem;
+    color: var(--yellow-color);
+    list-style: none;
+    padding: 1rem 2rem;
+    margin: 0 0.5rem;
+    font-weight: 700;
+}
+
+.navbar a {
+    color: var(--yellow-color); 
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    color: var(--dark-color);
+    background-color: var(--yellow-color);
+}
+
+
+
+/*Favorite movies styles*/
+
+
+.fav-button {
+    background-color: var(--yellow-color);
+    border: none;
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.fav-button.favorited {
+    background-color: red;
+    color: white;
+}
+ 
+.favorites-container {
+    background-color: var(--light-dark-color);
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.favorites-container h2 {
+    color: var(--yellow-color);
+    text-align: center;
+}
+
+.favorite-movie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--md-dark-color);
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.favorite-movie img {
+    width: 50px;
+    height: 75px;
+    border-radius: 5px;
+}
+
+.favorite-movie h3 {
+    color: white;
+    flex: 1;
+    margin-left: 10px;
+}
+
+.favorite-movie .remove-fav {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+} 
